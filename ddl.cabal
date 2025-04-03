@@ -29,4 +29,5 @@ Executable ddl
                  , TypeOperators
                  , Rank2Types
    other-modules:  DDL.DDLToken
+                 , DDL.Interpreter
                  

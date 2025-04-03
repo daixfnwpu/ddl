@@ -47,6 +47,7 @@ data Expr
     | WhileExpr Expr Expr               -- while 语句
     | ForExpr String Expr Expr          -- for 语句
     | TryCatchExpr Expr String Expr     -- try-catch 语句
+    | FunctionExpr [String] Expr
     deriving (Show, Eq)
 
 data Pattern

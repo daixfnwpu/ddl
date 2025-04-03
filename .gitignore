@@ -9,3 +9,6 @@ dist-newstyle/*
 .stack-work/dist/x86_64-linux/ghc-9.4.8/build/ddl/ddl-tmp/DDL/DDLToken.o
 .stack-work/dist/x86_64-linux/ghc-9.4.8/stack-build-caches/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/exe-ddl
 .stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/bin/ddl
+.stack-work/stack.sqlite3
+.stack-work/dist/x86_64-linux/ghc-9.4.8/setup-config
+.stack-work/stack.sqlite3
