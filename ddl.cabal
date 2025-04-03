@@ -1,0 +1,31 @@
+Name:                ddl
+Version:             1.1.2
+License:             GPL
+License-file:        LICENSE
+Synopsis:            List of the ddl code
+Description:         List of all the haskell language of the ddl
+Category:            Game
+Author:              daixfnwpu 
+Maintainer:          daixfnwpu@gmail.com
+Homepage:            http://haskell.org/haskellwiki/ddl
+Build-Type:          Simple
+Cabal-Version:       >= 1.2
+data-files:
+      README.md
+Executable ddl
+   Main-is:        Main.hs
+   Build-Depends:  base
+                 , array
+                 , parsec
+                 , indents
+
+   Hs-source-dirs: src
+   Ghc-options:    -O2 -funbox-strict-fields -optc-O2
+   Extensions:     BangPatterns
+                 , FunctionalDependencies
+                 , FlexibleInstances
+                 , MultiParamTypeClasses
+                 , TypeOperators
+                 , Rank2Types
+   other-modules:  DDL.DDLToken
+                 
