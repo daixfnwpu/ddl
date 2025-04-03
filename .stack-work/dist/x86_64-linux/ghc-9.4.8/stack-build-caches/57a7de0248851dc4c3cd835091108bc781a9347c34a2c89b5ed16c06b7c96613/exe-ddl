@@ -1,8 +1,8 @@
 /root/haskell/ddl/README.md:
   hash: e8f73d4723fb916cd22c44c578b1a01fd50a8b30da0fbced515677596740226f
 /root/haskell/ddl/ddl.cabal:
-  hash: ddc599a8726787bb33945ad615414457f0f1b8c38d9257f052551da8d2295af3
+  hash: 27169d615db6328e987f790be698b4ce96c4c085c68fe9aba9ec48962c881309
 /root/haskell/ddl/src/DDL/DDLToken.hs:
-  hash: 93a0bfa3aa9d38c390d015139193d992b1ebcdd8ee5b25eca173270166f8aad1
+  hash: 9915e8b2652e44404c81ca786ca0249fad010f22c17dea2fc2f4cf9120b5865f
 /root/haskell/ddl/src/Main.hs:
   hash: c80f400bf4a1507336ffdf08433fa3c3b08caf878c55be464f9323488b61ee9a

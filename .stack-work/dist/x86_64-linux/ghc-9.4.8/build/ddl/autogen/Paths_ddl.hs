@@ -42,12 +42,12 @@ getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: 
 
 
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
-bindir     = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/bin"
-libdir     = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/lib/x86_64-linux-ghc-9.4.8/ddl-1.1.2-GTxCW75DI4ODRSTsDqvSoz-ddl"
-dynlibdir  = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/lib/x86_64-linux-ghc-9.4.8"
-datadir    = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/share/x86_64-linux-ghc-9.4.8/ddl-1.1.2"
-libexecdir = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/libexec/x86_64-linux-ghc-9.4.8/ddl-1.1.2"
-sysconfdir = "/root/haskell/ddl/.stack-work/install/x86_64-linux/57a7de0248851dc4c3cd835091108bc781a9347c34a2c89b5ed16c06b7c96613/9.4.8/etc"
+bindir     = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/bin"
+libdir     = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/lib/x86_64-linux-ghc-9.4.8/ddl-1.1.2-8UV8dXBkMoZDDgIOx44qVz-ddl"
+dynlibdir  = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/lib/x86_64-linux-ghc-9.4.8"
+datadir    = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/share/x86_64-linux-ghc-9.4.8/ddl-1.1.2"
+libexecdir = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/libexec/x86_64-linux-ghc-9.4.8/ddl-1.1.2"
+sysconfdir = "/root/haskell/ddl/.stack-work/install/x86_64-linux/1fbc975d407394786f45edcfceab17be14242fcb6998923c7c5f10c6d52ef277/9.4.8/etc"
 
 getBinDir     = catchIO (getEnv "ddl_bindir")     (\_ -> return bindir)
 getLibDir     = catchIO (getEnv "ddl_libdir")     (\_ -> return libdir)

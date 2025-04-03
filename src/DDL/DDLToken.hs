@@ -1,16 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE UnicodeSyntax #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use $>" #-}
 {-# HLINT ignore "Use <$>" #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
 module DDL.DDLToken where
 import Text.Parsec
 import Text.Parsec.String (Parser)
+import Text.Parsec.Error
+    ( ParseError)
 import Text.Parsec.Token as Tok
 import Text.Parsec.Language (emptyDef)
 import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isLetter)
 import System.IO (hFlush, stdout)
+import qualified Data.Map as Map
+import Text.Printf (printf)
 --import Text.Parsec.Indent 
 
 data Token
@@ -38,6 +44,9 @@ data Expr
     | MatchExpr Expr [(Pattern,Expr)]
     | FunctionDef String [Pattern] Expr
     | TypeAnnotation String String
+    | WhileExpr Expr Expr               -- while 语句
+    | ForExpr String Expr Expr          -- for 语句
+    | TryCatchExpr Expr String Expr     -- try-catch 语句
     deriving (Show, Eq)
 
 data Pattern
@@ -48,6 +57,64 @@ data Pattern
 -- 关键字列表
 keywords :: [String]
 keywords = ["if", "else", "match", "while", "for", "fun", "let", "return", "try", "catch"]
+
+-- TokenParseError with position information
+data TokenParseError = TokenParseError ParseError  -- You may want to store the whole `ParseError` here
+    deriving Show
+
+-- MessageParseError with a custom message
+data MessageParseError = MessageParseError String
+    deriving Show
+
+-- A wrapper for both error types
+data ParseErrorWrapper
+    = TokenError TokenParseError
+    | MessageError MessageParseError
+    deriving Show
+
+-- 格式化 ParseError 为自定义 MessageParseError
+convertToMessageError :: ParseError -> MessageParseError
+convertToMessageError err =
+    let pos = errorPos err
+        line = sourceLine pos
+        col = sourceColumn pos
+        msg = "Parsing error: " ++ show err
+    in MessageParseError $ printf msg line col
+
+
+
+type Env = Map.Map String Expr
+
+stdLib :: Env
+stdLib = Map.fromList
+    [ ("sqrt", FunctionDef "sqrt" [PatternVar "x"] (CallExpr "sqrt" [IdentifierExpr "x"]))
+    , ("sin", FunctionDef "sin" [PatternVar "x"] (CallExpr "sin" [IdentifierExpr "x"]))
+    , ("cos", FunctionDef "cos" [PatternVar "x"] (CallExpr "cos" [IdentifierExpr "x"]))
+    , ("tan", FunctionDef "tan" [PatternVar "x"] (CallExpr "tan" [IdentifierExpr "x"]))
+    , ("length", FunctionDef "length" [PatternVar "s"] (CallExpr "length" [IdentifierExpr "s"]))
+    , ("toUpper", FunctionDef "toUpper" [PatternVar "s"] (CallExpr "toUpper" [IdentifierExpr "s"]))
+    , ("map", FunctionDef "map" [PatternVar "f", PatternVar "lst"] (CallExpr "map" [IdentifierExpr "f", IdentifierExpr "lst"]))
+    , ("filter", FunctionDef "filter" [PatternVar "f", PatternVar "lst"] (CallExpr "filter" [IdentifierExpr "f", IdentifierExpr "lst"]))
+    , ("reduce", FunctionDef "reduce" [PatternVar "f", PatternVar "acc", PatternVar "lst"] (CallExpr "reduce" [IdentifierExpr "f", IdentifierExpr "acc", IdentifierExpr "lst"]))
+    ]
+
+-- 格式化错误信息，提供具体的行号和列号
+-- Format a ParseError with line and column information
+formatParseError :: ParseError -> String
+formatParseError err =
+    let pos = errorPos err  -- Extract the position from the ParseError 
+        line = sourceLine pos
+        col  = sourceColumn pos 
+    in printf "Parse error at line %d, column %d: %s" line col (show err)
+
+
+
+-- 改进错误报告
+parseWithError :: Parser a -> String -> Either String a
+parseWithError p input = case parse p "Parser" input of
+    Left err -> Left ("Syntax Error: " ++ show err)
+    Right res -> Right res
+
 
 -- 解析关键字
 keywordParser :: Parser Token
@@ -94,10 +161,55 @@ stringParser = do
 
 -- 解析运算符
 operators :: [String]
-operators = ["+", "-", "*", "/", "=", "==", "!=", "<", ">", "<=", ">="]
+operators = ["+", "-", "*", "/", "=", "==", "!=", "<", ">", "<=", ">=","|","||"]
 
 operatorParser :: Parser Token
 operatorParser = choice (map (try . string) operators) >>= \op -> spaces >> return (TokOperator op)
+
+-- 解析 while 语句
+whileExprParser :: Parser Expr
+whileExprParser = do
+    _ <- string "while"
+    spaces
+    cond <- exprParser
+    spaces
+    _ <- string "do"
+    spaces
+    body <- exprParser
+    return (WhileExpr cond body)
+
+-- 解析 for 语句
+forExprParser :: Parser Expr
+forExprParser = do
+    _ <- string "for"
+    spaces
+    var <- many1 letter
+    spaces
+    _ <- string "in"
+    spaces
+    rangeExpr <- exprParser
+    spaces
+    _ <- string "do"
+    spaces
+    body <- exprParser
+    return (ForExpr var rangeExpr body)
+
+-- 解析 try-catch 语句
+tryCatchParser :: Parser Expr
+tryCatchParser = do
+    _ <- string "try"
+    spaces
+    tryExpr <- exprParser
+    spaces
+    _ <- string "catch"
+    spaces
+    var <- many1 letter
+    spaces
+    _ <- string "->"
+    spaces
+    catchExpr <- exprParser
+    return (TryCatchExpr tryExpr var catchExpr)
+
 
 -- 解析符号
 symbols :: [Char]
@@ -146,8 +258,12 @@ tokenParser = do
 
 -- 解析表达式（AST 解析器）
 exprParser :: Parser Expr
-exprParser = try matchExprParser <|> try functionDefParser <|> try typeAnnotationParser <|> try ifExprParser <|> try letExprParser <|> try binaryOpParser <|> try callParser <|> simpleExpr
-    
+exprParser = try matchExprParser <|> try functionDefParser <|> try typeAnnotationParser <|> try ifExprParser
+                <|> try letExprParser <|> try binaryOpParser <|> try callParser <|> simpleExpr
+                <|> try whileExprParser
+                <|> try forExprParser
+                <|> try tryCatchParser
+
 
 simpleExpr :: Parser Expr
 simpleExpr = numberExprParser <|> stringExprParser <|> identifierExprParser
@@ -268,9 +384,16 @@ tokenize = parse tokenParser "Lexer"
 parseExpr :: String -> Either ParseError Expr
 parseExpr = parse exprParser "Parser"
 
+getContentsUntilEmpty :: IO String
+getContentsUntilEmpty = do
+    line <- getLine
+    if null line then return "" else do
+        rest <- getContentsUntilEmpty
+        return (line ++ "\n" ++ rest)
+
 repl :: IO ()
 repl = do
-    putStr "Lexer> "
+    putStr "DDL> "
     hFlush stdout
     input <- getLine
     if input == ":quit"
@@ -279,12 +402,12 @@ repl = do
             case tokenize input of
                 Left err  -> print err
                 Right toks -> print toks
-            case parseExpr input of
+            case parseWithError exprParser input of
                 Left err -> print err
                 Right ast -> print ast
             repl
 
 runMain :: IO ()
 runMain = do
-    putStrLn "Welcome to the Lexer REPL. Type :quit to exit."
+    putStrLn "Welcome to the DDL REPL. Type :quit to exit."
     repl

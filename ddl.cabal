@@ -18,6 +18,7 @@ Executable ddl
                  , array
                  , parsec
                  , indents
+                 , containers >=0.6.7
 
    Hs-source-dirs: src
    Ghc-options:    -O2 -funbox-strict-fields -optc-O2
