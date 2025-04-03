@@ -146,8 +146,8 @@ tokenParser = do
 
 -- 解析表达式（AST 解析器）
 exprParser :: Parser Expr
-exprParser = try ifExprParser <|> try letExprParser <|> try binaryOpParser <|> try callParser <|> simpleExpr
-    <|> try matchExprParser <|> try functionDefParser <|> try typeAnnotationParser
+exprParser = try matchExprParser <|> try functionDefParser <|> try typeAnnotationParser <|> try ifExprParser <|> try letExprParser <|> try binaryOpParser <|> try callParser <|> simpleExpr
+    
 
 simpleExpr :: Parser Expr
 simpleExpr = numberExprParser <|> stringExprParser <|> identifierExprParser
