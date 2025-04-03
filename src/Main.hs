@@ -1,5 +1,5 @@
 module Main where
 import DDL.DDLToken
-import DDL.Interpreter
+import qualified DDL.Interpreter
 
-main = DDL.DDLToken.runMain
+main = DDL.Interpreter.runMain
